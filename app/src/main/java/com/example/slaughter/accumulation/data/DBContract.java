@@ -23,4 +23,13 @@ public final class DBContract {
         public static final String COLUMN_IS_DEFAULT = "is_default";
     }
 
+    public static final class BalanceData implements BaseColumns {
+        public static final String TABLE_NAME = "balance_data";
+
+        public static final String _ID = BaseColumns._ID;
+        public static final String COLUMN_TOTAL_USD = "total";
+        public static final String COLUMN_DELTA = "delta";
+        public static final String COLUMN_NOTE = "note";
+        public static final String COLUMN_TIMESTAMP = "timestamp";
+    }
 }

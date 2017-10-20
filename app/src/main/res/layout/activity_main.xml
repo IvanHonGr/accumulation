@@ -4,37 +4,55 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="200dp">
+        android:layout_height="200dp"
+        android:orientation="vertical">
 
         <ListView
             android:id="@+id/listView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
     </LinearLayout>
 
-    <Button
-        android:text="Add New Entry"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="addEntry"
-        android:id="@+id/addItem"
-        android:textAppearance="@style/TextAppearance.AppCompat" />
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/buttonChoise"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="onClick"
-        android:text="Calculate USD Sum"
-        android:textAppearance="@style/TextAppearance.AppCompat" />
+        <Button
+            android:id="@+id/addItem"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="fill_horizontal"
+            android:onClick="addEntry"
+            android:text="Add New Entry"
+            android:textAppearance="@style/TextAppearance.AppCompat" />
 
-    <Button
-        android:id="@+id/manageCurrency"
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="addCurrency"
-        android:text="Manage Currency" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/buttonChoise"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="onClick"
+            android:text="Calculate USD Sum"
+            android:textAppearance="@style/TextAppearance.AppCompat" />
+
+        <Button
+            android:id="@+id/manageCurrency"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:onClick="addCurrency"
+            android:text="Manage Currency"
+            android:textAppearance="@style/TextAppearance.AppCompat" />
+    </LinearLayout>
 
 </LinearLayout>

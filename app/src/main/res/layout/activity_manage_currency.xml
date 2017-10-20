@@ -5,18 +5,20 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="390dp">
+        android:layout_height="250dp">
 
         <ListView
             android:id="@+id/listView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
     </LinearLayout>
+
     <Button
-        android:text="Add New Entry"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="addCurrency"
         android:id="@+id/addItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:onClick="addCurrency"
+        android:text="Add New Entry"
         android:textAppearance="@style/TextAppearance.AppCompat" />
 </LinearLayout>
