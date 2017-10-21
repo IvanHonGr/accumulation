@@ -57,12 +57,12 @@ public class EntryDbHelper extends SQLiteOpenHelper {
         }
 
         try {
-            String SQL_CREATE_CURRENCY_TABLE = "CREATE TABLE " + DBContract.CurrencyTable.TABLE_NAME + " ("
+            String SQL_CREATE_CURRENCY_TABLE = "CREATE TABLE " + DBContract.BalanceData.TABLE_NAME + " ("
                     + DBContract.BalanceData._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + DBContract.BalanceData.COLUMN_TOTAL_USD + " TEXT NOT NULL, "
-                    + DBContract.BalanceData.COLUMN_DELTA + " TEXT NOT NULL, "
+                    + DBContract.BalanceData.COLUMN_AMOUNT + " TEXT NOT NULL, "
                     + DBContract.BalanceData.COLUMN_NOTE + " TEXT NOT NULL, "
-                    + DBContract.BalanceData.COLUMN_TIMESTAMP + " INTEGER(11) NOT NULL);";
+                    + DBContract.BalanceData.COLUMN_DATE + " TEXT NOT NULL);";
             db.execSQL(SQL_CREATE_CURRENCY_TABLE);
         } catch (Exception e) {
             Log.e("DB", e.getMessage());

@@ -28,8 +28,8 @@ public final class DBContract {
 
         public static final String _ID = BaseColumns._ID;
         public static final String COLUMN_TOTAL_USD = "total";
-        public static final String COLUMN_DELTA = "delta";
+        public static final String COLUMN_AMOUNT = "amount";
         public static final String COLUMN_NOTE = "note";
-        public static final String COLUMN_TIMESTAMP = "timestamp";
+        public static final String COLUMN_DATE = "date";
     }
 }

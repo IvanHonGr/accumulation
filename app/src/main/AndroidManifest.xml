@@ -19,7 +19,8 @@
             android:label="Edit Entry">
         </activity>
         <activity android:name=".ui.ManageCurrencyActivity" />
-        <activity android:name=".ui.EditCurrencyActivity"></activity>
+        <activity android:name=".ui.EditCurrencyActivity" />
+        <activity android:name=".ui.SaveBalanceActivity"></activity>
     </application>
 
 </manifest>

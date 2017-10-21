@@ -74,12 +74,9 @@ public class MainActivity extends AppCompatActivity {
         mArrayAdapter.notifyDataSetChanged();
     }
 
-    public void onClick(View v) {
-        //on click top button
-        String result = String.format("Total %s", getSumm(entryList));
-
-        Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG)
-                .show();
+    public void calculateBalance(View v) {
+        Intent intent = new Intent(MainActivity.this, SaveBalanceActivity.class);
+        startActivityForResult(intent, NEW_ENTRY);
     }
 
     public void addEntry(View view) {
@@ -92,22 +89,9 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, NEW_ENTRY);
     }
 
-    private String getSumm(List<Entry> list) {
-        int resultUsd = 0;
-        int resultUah = 0;
-        //todo
-        return String.format("\nUSD: %s \nUAH: %s", resultUsd, resultUah);
-    }
-
     private void readSavedResults() {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         entryList.clear();
-
-        String[] projection = {
-                DBContract.EntryTable._ID,
-                DBContract.EntryTable.COLUMN_PLACE,
-                DBContract.EntryTable.COLUMN_VALUE,
-                DBContract.EntryTable.COLUMN_CURRENCY };
 
         String rawQuery = "SELECT " + DBContract.EntryTable.TABLE_NAME + "." + DBContract.EntryTable._ID + ", "
                 + DBContract.EntryTable.TABLE_NAME + "." + DBContract.EntryTable.COLUMN_PLACE + ", "

@@ -41,8 +41,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:onClick="onClick"
-            android:text="Calculate USD Sum"
+            android:onClick="calculateBalance"
+            android:text="Calculate Balance"
             android:textAppearance="@style/TextAppearance.AppCompat" />
 
         <Button
