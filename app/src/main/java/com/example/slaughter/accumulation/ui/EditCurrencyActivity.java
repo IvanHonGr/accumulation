@@ -1,6 +1,5 @@
 package com.example.slaughter.accumulation.ui;
 
-import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -53,7 +52,7 @@ public class EditCurrencyActivity extends AppCompatActivity {
 
     public void saveCurrency(View view) {
         Currency currency = new Currency(name.getText().toString(), sign.getText().toString(), Float.valueOf(exchangeRate.getText().toString()));
-        updateEntry(currency, currentId);
+        Currency.updateCurrency(this, currency, currentId);
         finish();
     }
 
@@ -68,24 +67,5 @@ public class EditCurrencyActivity extends AppCompatActivity {
         finish();
     }
 
-    private void updateEntry(Currency currency, int index) {
-        EntryDbHelper mDbHelper = new EntryDbHelper(this);
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-        ContentValues values = new ContentValues();
-        values.put(DBContract.CurrencyTable.COLUMN_NAME, currency.getName());
-        values.put(DBContract.CurrencyTable.COLUMN_SIGN, currency.getSign());
-        values.put(DBContract.CurrencyTable.COLUMN_EXCHANGE_RATE, currency.getExchangeRate());
-        values.put(DBContract.CurrencyTable.COLUMN_IS_DEFAULT, "0");
-
-        if (index >= 0) {
-
-            String where = DBContract.EntryTable._ID + "= ?";
-            String[] i = {Integer.toString(index)};
-
-            db.update(DBContract.CurrencyTable.TABLE_NAME, values, where, i);
-        } else {
-            db.insert(DBContract.CurrencyTable.TABLE_NAME, null, values);
-        }
-    }
 }

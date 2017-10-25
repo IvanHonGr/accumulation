@@ -27,10 +27,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private ListView mListView;
-    private ArrayList<Entry> entryList = new ArrayList<>();
+    private List<Entry> entryList = new ArrayList<>();
     private MyArrayAdapter mArrayAdapter;
-
-    private EntryDbHelper mDbHelper;
 
 
     static final private int NEW_ENTRY = 0;
@@ -49,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
 
         mListView.setAdapter(mArrayAdapter);
         mListView.setOnItemClickListener(myOnItemClickListener);
-        mDbHelper = new EntryDbHelper(this);
     }
 
     AdapterView.OnItemClickListener myOnItemClickListener = new AdapterView.OnItemClickListener() {
@@ -90,45 +87,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void readSavedResults() {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
         entryList.clear();
-
-        String rawQuery = "SELECT " + DBContract.EntryTable.TABLE_NAME + "." + DBContract.EntryTable._ID + ", "
-                + DBContract.EntryTable.TABLE_NAME + "." + DBContract.EntryTable.COLUMN_PLACE + ", "
-                + DBContract.EntryTable.TABLE_NAME + "." + DBContract.EntryTable.COLUMN_VALUE + ", "
-                + DBContract.CurrencyTable.TABLE_NAME + "." + DBContract.CurrencyTable.COLUMN_NAME + ", "
-                + DBContract.CurrencyTable.TABLE_NAME + "." + DBContract.CurrencyTable.COLUMN_SIGN
-                + " FROM " + DBContract.EntryTable.TABLE_NAME + " INNER JOIN " + DBContract.CurrencyTable.TABLE_NAME
-                + " ON " + DBContract.EntryTable.TABLE_NAME + "." + DBContract.EntryTable.COLUMN_CURRENCY +
-                " = " + DBContract.CurrencyTable.TABLE_NAME + "." + DBContract.CurrencyTable._ID;
-        Cursor cursor = db.rawQuery(rawQuery, null);
-
-        try {
-            int idColumnIndex = cursor.getColumnIndex(DBContract.EntryTable._ID);
-            int placeColumnIndex = cursor.getColumnIndex(DBContract.EntryTable.COLUMN_PLACE);
-            int valueColumnIndex = cursor.getColumnIndex(DBContract.EntryTable.COLUMN_VALUE);
-
-            int currencyNameColumnIndex = cursor.getColumnIndex(DBContract.CurrencyTable.COLUMN_NAME);
-            int currencySignColumnIndex = cursor.getColumnIndex(DBContract.CurrencyTable.COLUMN_SIGN);
-//            int currencyExchangeRateColumnIndex = cursor.getColumnIndex(DBContract.CurrencyTable.COLUMN_EXCHANGE_RATE);
-//            int currencyDefaultColumnIndex = cursor.getColumnIndex(DBContract.CurrencyTable.COLUMN_IS_DEFAULT);
-
-            while (cursor.moveToNext()) {
-                int id = cursor.getInt(idColumnIndex);
-                String currentPlace = cursor.getString(placeColumnIndex);
-                String currentValue = cursor.getString(valueColumnIndex);
-                String currencyName = cursor.getString(currencyNameColumnIndex);
-                String currencySign = cursor.getString(currencySignColumnIndex);
-//                float currencyExchangeRage = cursor.getFloat(currencyExchangeRateColumnIndex);
-//                int currencyIsDefault = cursor.getInt(currencyDefaultColumnIndex);
-                Currency currentCurrency = new Currency(currencyName, currencySign);
-                Entry entry = new Entry(currentPlace, currentValue, currentCurrency);
-                entry.setId(id);
-                entryList.add(entry);
-            }
-        } finally {
-            cursor.close();
-        }
+        entryList.addAll(Entry.getAllEntries(this));
     }
 
     private class MyArrayAdapter extends ArrayAdapter<Entry> {

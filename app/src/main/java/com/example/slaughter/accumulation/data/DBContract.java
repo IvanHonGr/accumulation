@@ -27,7 +27,8 @@ public final class DBContract {
         public static final String TABLE_NAME = "balance_data";
 
         public static final String _ID = BaseColumns._ID;
-        public static final String COLUMN_TOTAL_USD = "total";
+        public static final String COLUMN_TOTAL_UAH = "total_uah";
+        public static final String COLUMN_USD_EXCHANGE_RATE = "usd_rate";
         public static final String COLUMN_AMOUNT = "amount";
         public static final String COLUMN_NOTE = "note";
         public static final String COLUMN_DATE = "date";

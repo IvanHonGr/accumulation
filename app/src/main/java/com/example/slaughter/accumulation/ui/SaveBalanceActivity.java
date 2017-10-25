@@ -1,9 +1,6 @@
 package com.example.slaughter.accumulation.ui;
 
 import android.app.Activity;
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -14,11 +11,10 @@ import android.widget.Toast;
 
 import com.example.slaughter.accumulation.R;
 import com.example.slaughter.accumulation.Utils;
+import com.example.slaughter.accumulation.data.BalanceHelper;
 import com.example.slaughter.accumulation.data.Currency;
-import com.example.slaughter.accumulation.data.DBContract;
-import com.example.slaughter.accumulation.data.EntryDbHelper;
+import com.example.slaughter.accumulation.data.Entry;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -27,6 +23,8 @@ public class SaveBalanceActivity extends Activity {
     private EditText date, amount, note;
     private Spinner currency, month;
     private TextView currentBalance, reportDetails;
+    private String currentBalanceUahValue;
+    private String usdRate = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,100 +37,58 @@ public class SaveBalanceActivity extends Activity {
         currentBalance = (TextView) findViewById(R.id.currentBalance);
         reportDetails = (TextView) findViewById(R.id.reportDetails);
         month = (Spinner) findViewById(R.id.month);
-
         initFields();
         activateAdapter();
 
-        String result = String.format("Current Balance: $%s", getSum());
+        currentBalanceUahValue = getSum();
+        String result = String.format("Current Balance: $%s", currentBalanceUahValue);
         currentBalance.setText(result);
-
-//        Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG)
-//                .show();
     }
 
-
-
     public void saveBalance(View view) {
-        EntryDbHelper mDbHelper = new EntryDbHelper(this);
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(DBContract.BalanceData.COLUMN_TOTAL_USD, getSum());
-        values.put(DBContract.BalanceData.COLUMN_AMOUNT, amount.getText().toString());
-        values.put(DBContract.BalanceData.COLUMN_DATE, date.getText().toString());
-        values.put(DBContract.BalanceData.COLUMN_NOTE, note.getText().toString());
-        db.insert(DBContract.BalanceData.TABLE_NAME, null, values);
+        String amountUah = getText(amount);
+        BalanceHelper.addBalance(this, currentBalanceUahValue, usdRate, amountUah, getText(date), getText(note));
 
         Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_SHORT).show();
         initFields();
     }
 
+    private String getText(EditText editText) {
+        return editText.getText().toString();
+    }
+
     public void calculateDiff(View view) {
-        EntryDbHelper mDbHelper = new EntryDbHelper(this);
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        String salary = "Salary";
+        String lastBalance = "Last Balance";
 
-        String rawQuery = "SELECT * FROM " + DBContract.BalanceData.TABLE_NAME +
-                " WHERE " + DBContract.BalanceData.COLUMN_DATE + " like '%" + Utils.getMonth(-1)
-                + "/%/%' ORDER BY date DESC";
-        Cursor cursor = db.rawQuery(rawQuery, null);
-
-        try {
-            int dateColumnIndex = cursor.getColumnIndex(DBContract.BalanceData.COLUMN_DATE);
-            int balanceColumnIndex = cursor.getColumnIndex(DBContract.BalanceData.COLUMN_TOTAL_USD);
-            int amountColumnIndex = cursor.getColumnIndex(DBContract.BalanceData.COLUMN_AMOUNT);
-
-            if (cursor.moveToNext()) {
-//                String date = cursor.getString(dateColumnIndex);
-                String balance = cursor.getString(balanceColumnIndex);
-//                String amount = cursor.getString(amountColumnIndex);
-
-                this.amount.setText(Utils.difference(balance, getSum()));
-            }
-        } finally {
-            cursor.close();
+        String message;
+        if (BalanceHelper.getBalanceRowsForCurrentMonth(this).isEmpty()) {
+            message = salary;
+            String balanceForPreviousMonth = BalanceHelper.getBalanceForPreviousMonth(this);
+            amount.setText(Utils.difference(balanceForPreviousMonth, currentBalanceUahValue));
+        } else {
+            message = lastBalance;
         }
-
-        //if first row for current month
-        //Balance with salary
-        //else
-        //Last Balance
+        note.setText(message);
 
     }
 
     private String getSum() {
         float resultUsd = 0;
-        //todo
+        List<Entry> entries = Entry.getAllEntries(this);
+        for (Entry entry: entries) {
+            Currency currency = entry.getCurrency();
+            resultUsd += Utils.multiply(entry.getValue(), currency.getExchangeRate());
+            if ("USD".equals(currency.getName())) {
+                usdRate = Float.toString(currency.getExchangeRate());
+            }
+        }
         return String.format(Locale.US, "%.2f", resultUsd);
     }
 
     private void activateAdapter() {
         currency = (Spinner) findViewById(R.id.spinnerCur);
-        List<Currency> list = new ArrayList<>();
-        EntryDbHelper mDbHelper = new EntryDbHelper(this);
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
-        String rawQuery = "SELECT * FROM " + DBContract.CurrencyTable.TABLE_NAME;
-        Cursor cursor = db.rawQuery(rawQuery, null);
-
-        try {
-            int idColumnIndex = cursor.getColumnIndex(DBContract.CurrencyTable._ID);
-            int currencyNameColumnIndex = cursor.getColumnIndex(DBContract.CurrencyTable.COLUMN_NAME);
-            int currencySignColumnIndex = cursor.getColumnIndex(DBContract.CurrencyTable.COLUMN_SIGN);
-            int currencyExchangeRateColumnIndex = cursor.getColumnIndex(DBContract.CurrencyTable.COLUMN_EXCHANGE_RATE);
-
-            while (cursor.moveToNext()) {
-                int id = cursor.getInt(idColumnIndex);
-                String currencyName = cursor.getString(currencyNameColumnIndex);
-                String currencySign = cursor.getString(currencySignColumnIndex);
-                float currencyExchangeRate = cursor.getFloat(currencyExchangeRateColumnIndex);
-
-                Currency currency = new Currency(currencyName, currencySign, currencyExchangeRate, id);
-                list.add(currency);
-            }
-        } finally {
-            cursor.close();
-        }
-
+        List<Currency> list = Currency.getListOfCurrencies(this);
         ArrayAdapter<Currency> dataAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, list);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -140,9 +96,15 @@ public class SaveBalanceActivity extends Activity {
     }
 
     public void showReportDetails(View view) {
-        reportDetails.setText("today - something +200 uah \n" +
-                "yesterday +41500 usd \n" +
-                "total bla bla");
+        String report = "";
+        for (String row: BalanceHelper.getBalanceRowsForCurrentMonth(this)) {
+            if (report.isEmpty()) {
+                report = row;
+            } else {
+                report = String.format("%s\n%s", report, row);
+            }
+        }
+        reportDetails.setText(report);
     }
 
     private void initFields() {

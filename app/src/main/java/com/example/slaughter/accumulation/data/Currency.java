@@ -1,5 +1,16 @@
 package com.example.slaughter.accumulation.data;
 
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.widget.Toast;
+
+import com.example.slaughter.accumulation.Utils;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Currency {
     public static final String NAME = "Name";
     public static final String SIGN = "Sign";
@@ -69,4 +80,58 @@ public class Currency {
     public String getListName() {
         return String.format("%s    %s %s", name, exchangeRate, sign);
     }
+
+    public static ArrayList<Currency> getListOfCurrencies(Context context) {
+        ArrayList<Currency> list = new ArrayList<>();
+        EntryDbHelper mDbHelper = new EntryDbHelper(context);
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+        String rawQuery = "SELECT * FROM " + DBContract.CurrencyTable.TABLE_NAME;
+        Cursor cursor = db.rawQuery(rawQuery, null);
+
+        try {
+            int idColumnIndex = cursor.getColumnIndex(DBContract.CurrencyTable._ID);
+
+            int currencyNameColumnIndex = cursor.getColumnIndex(DBContract.CurrencyTable.COLUMN_NAME);
+            int currencySignColumnIndex = cursor.getColumnIndex(DBContract.CurrencyTable.COLUMN_SIGN);
+            int currencyExchangeRateColumnIndex = cursor.getColumnIndex(DBContract.CurrencyTable.COLUMN_EXCHANGE_RATE);
+            int currencyDefaultColumnIndex = cursor.getColumnIndex(DBContract.CurrencyTable.COLUMN_IS_DEFAULT);
+
+            while (cursor.moveToNext()) {
+                int id = cursor.getInt(idColumnIndex);
+                String currencyName = cursor.getString(currencyNameColumnIndex);
+                String currencySign = cursor.getString(currencySignColumnIndex);
+                float currencyExchangeRate = cursor.getFloat(currencyExchangeRateColumnIndex);
+                int currencyIsDefault = cursor.getInt(currencyDefaultColumnIndex);
+                Currency currentCurrency = new Currency(currencyName, currencySign, currencyExchangeRate, id);
+                currentCurrency.setDefault(currencyIsDefault == 1);
+                list.add(currentCurrency);
+            }
+        } finally {
+            cursor.close();
+        }
+        return list;
+    }
+
+    public static void updateCurrency(Context context, Currency currency, int index) {
+        EntryDbHelper mDbHelper = new EntryDbHelper(context);
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(DBContract.CurrencyTable.COLUMN_NAME, currency.getName());
+        values.put(DBContract.CurrencyTable.COLUMN_SIGN, currency.getSign());
+        values.put(DBContract.CurrencyTable.COLUMN_EXCHANGE_RATE, currency.getExchangeRate());
+        values.put(DBContract.CurrencyTable.COLUMN_IS_DEFAULT, "0");
+
+        if (index >= 0) {
+
+            String where = DBContract.EntryTable._ID + "= ?";
+            String[] i = {Integer.toString(index)};
+
+            db.update(DBContract.CurrencyTable.TABLE_NAME, values, where, i);
+        } else {
+            db.insert(DBContract.CurrencyTable.TABLE_NAME, null, values);
+        }
+    }
+
 }

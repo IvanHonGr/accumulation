@@ -28,8 +28,6 @@ public class ManageCurrencyActivity extends AppCompatActivity {
     private ArrayList<Currency> currencyList = new ArrayList<>();
     private MyArrayAdapter mArrayAdapter;
 
-    private EntryDbHelper mDbHelper;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +40,6 @@ public class ManageCurrencyActivity extends AppCompatActivity {
 
         mListView.setAdapter(mArrayAdapter);
         mListView.setOnItemClickListener(myOnItemClickListener);
-        mDbHelper = new EntryDbHelper(this);
     }
 
     @Override
@@ -73,40 +70,8 @@ public class ManageCurrencyActivity extends AppCompatActivity {
     }
 
     private void readSavedResults() {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
         currencyList.clear();
-
-        String[] projection = {
-                DBContract.CurrencyTable._ID,
-                DBContract.CurrencyTable.COLUMN_NAME,
-                DBContract.CurrencyTable.COLUMN_SIGN,
-                DBContract.CurrencyTable.COLUMN_IS_DEFAULT,
-                DBContract.CurrencyTable.COLUMN_EXCHANGE_RATE };
-
-        String rawQuery = "SELECT * FROM " + DBContract.CurrencyTable.TABLE_NAME;
-        Cursor cursor = db.rawQuery(rawQuery, null);
-
-        try {
-            int idColumnIndex = cursor.getColumnIndex(DBContract.CurrencyTable._ID);
-
-            int currencyNameColumnIndex = cursor.getColumnIndex(DBContract.CurrencyTable.COLUMN_NAME);
-            int currencySignColumnIndex = cursor.getColumnIndex(DBContract.CurrencyTable.COLUMN_SIGN);
-            int currencyExchangeRateColumnIndex = cursor.getColumnIndex(DBContract.CurrencyTable.COLUMN_EXCHANGE_RATE);
-            int currencyDefaultColumnIndex = cursor.getColumnIndex(DBContract.CurrencyTable.COLUMN_IS_DEFAULT);
-
-            while (cursor.moveToNext()) {
-                int id = cursor.getInt(idColumnIndex);
-                String currencyName = cursor.getString(currencyNameColumnIndex);
-                String currencySign = cursor.getString(currencySignColumnIndex);
-                float currencyExchangeRate = cursor.getFloat(currencyExchangeRateColumnIndex);
-                int currencyIsDefault = cursor.getInt(currencyDefaultColumnIndex);
-                Currency currentCurrency = new Currency(currencyName, currencySign, currencyExchangeRate, id);
-                currentCurrency.setDefault(currencyIsDefault == 1);
-                currencyList.add(currentCurrency);
-            }
-        } finally {
-            cursor.close();
-        }
+        currencyList.addAll(Currency.getListOfCurrencies(this));
     }
 
     private class MyArrayAdapter extends ArrayAdapter<Currency> {
