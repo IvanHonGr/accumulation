@@ -4,12 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.widget.Toast;
-
-import com.example.slaughter.accumulation.Utils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Currency {
     public static final String NAME = "Name";
@@ -50,14 +46,6 @@ public class Currency {
 
     public float getExchangeRate() {
         return exchangeRate;
-    }
-
-    public void setExchangeRate(float exchangeRate) {
-        this.exchangeRate = exchangeRate;
-    }
-
-    public static Currency getCurrencyByName(String name) {
-        return null;
     }
 
     public int getId() {

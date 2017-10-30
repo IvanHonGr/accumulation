@@ -2,8 +2,6 @@ package com.example.slaughter.accumulation.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,8 +14,6 @@ import android.widget.TextView;
 
 import com.example.slaughter.accumulation.R;
 import com.example.slaughter.accumulation.data.Currency;
-import com.example.slaughter.accumulation.data.DBContract;
-import com.example.slaughter.accumulation.data.EntryDbHelper;
 
 import java.util.ArrayList;
 import java.util.List;
